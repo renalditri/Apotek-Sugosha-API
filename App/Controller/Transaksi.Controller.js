@@ -1,5 +1,16 @@
 const Transaksi = require("../Model/Transaksi.Model");
 
+exports.getAll = (req, res) => {
+  Transaksi.getAll((err, data) => {
+    if (err)
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving transaction."
+      });
+    else res.send(data);
+  })
+}
+
 exports.getFromPembeli = (req, res) => {
   Transaksi.getFromPembeli(req.params.pembeliID, (err, data) => {
     if (err)

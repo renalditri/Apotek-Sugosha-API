@@ -7,6 +7,22 @@ class Transaksi {
     this.data_pengiriman = transaksi.data_pengiriman;
   }
 
+  static getAll(result) {
+    sql.query("SELECT * FROM transaksi", (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(null, err);
+        return;
+      }
+      res = res.map((r) => {
+        r.data_pengiriman = JSON.parse(r.data_pengiriman);
+        return r;
+      })
+      console.log("transaksi: ", res);
+      result(null, res);
+    });
+  }
+
   static getFromPembeli(pembeliID, result) {
     sql.query(`SELECT * FROM transaksi WHERE id_pembeli = ${pembeliID}`, (err, res) => {
       if (err) {
