@@ -11,11 +11,11 @@ module.exports = app => {
 
   app.get("/produk", produk.getAll);
   app.get("/produk/:productID", produk.getOne);
-  app.get("/pembeli", pembeli.getAll);
-  app.get("/keranjang/:pembeliID", keranjang.getFromCustomer);
+  app.get("/pembeli", pembeli.getAll); 
+  app.get("/keranjang/:pembeliID", keranjang.getFromCustomer); //produk jadi json
   app.get("/kategori", kategori.getAll);
   app.get("/kategori/:kategoriID", kategori.getOne);
-  app.get("/kategori/:kategoriID/produk", kategori_produk.getFromCategory);
+  app.get("/kategori/:kategoriID/produk", kategori_produk.getFromCategory); //produk jadi json
   app.get("/transaksi", transaksi.getAll);
   app.get("/transaksi/status/:statusID", transaksi.getByStatus);
   app.get("/transaksi/pembeli/:pembeliID", transaksi.getFromPembeli);

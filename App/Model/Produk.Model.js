@@ -10,6 +10,7 @@ class Produk {
     this.satuan = produk.satuan;
     this.deskripsi = produk.deskripsi;
     this.img_path = produk.img_path;
+    this.last_updated = produk.last_updated;
   }
 
   static getAll(qparams, result) {
@@ -38,6 +39,7 @@ class Produk {
             WHERE prdk.id_produk = "${idProduk}"
           `);
           r.deskripsi = JSON.parse(r.deskripsi);
+          r.last_updated = r.last_updated.toISOString().split("T")[0];
           arr.push(r);
           const arrRow = row2.map(key => {
             return key.nama;
@@ -46,6 +48,7 @@ class Produk {
           if (i == (row.length - 1)) {
             console.log("Found products: ");
             console.log(arr);
+            console.log(arr[i].last_updated)
             result(null, arr)
           };
         })
@@ -77,7 +80,7 @@ class Produk {
 
   static update(produkID, produk, result) {
     sql.query(
-      "UPDATE produk SET nama = ?, harga = ?, qty = ?, satuan = ?, deskripsi = ? WHERE id_produk = ?",
+      'UPDATE produk SET nama = ?, harga = ?, qty = ?, satuan = ?, deskripsi = ? WHERE id_produk = ?, last_updated = current_date()',
       [produk.nama, produk.harga, produk.qty, produk.satuan, produk.deskripsi, produkID],
       (err, res) => {
         if (err) {

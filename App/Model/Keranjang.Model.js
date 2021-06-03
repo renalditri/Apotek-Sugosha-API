@@ -1,4 +1,5 @@
 const sql = require("../../db");
+const database = require("../../database");
 
 class Keranjang {
   constructor(keranjang) {
@@ -11,7 +12,8 @@ class Keranjang {
     const query =
     `
       SELECT 
-      krnj.id_pembeli, pmbl.nama as nama_pembeli, krnj.jumlah, prdk.nama as nama_produk, prdk.harga, prdk.qty, prdk.satuan, prdk.img_path
+      krnj.id_pembeli, pmbl.nama as nama_pembeli, krnj.jumlah, prdk.nama as nama_produk, 
+      prdk.harga, prdk.qty, prdk.satuan, prdk.img_path
       FROM keranjang as krnj 
       INNER JOIN pembeli as pmbl ON krnj.id_pembeli = pmbl.id_pembeli
       INNER JOIN produk as prdk ON krnj.id_produk = prdk.id_produk

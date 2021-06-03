@@ -12,12 +12,13 @@ class Transaksi {
     let row;
     database.query(`
       SELECT
-      trn.nomor_transaksi, sts.jenis, sts.status, bkt.img_path as bukti_pembayaran, 
-      trn.id_pembeli, pmb.nama, pmb.nomor_telepon, trn.data_pengiriman
+      trn.nomor_transaksi, trn.id_pembeli, sts.jenis, rsp.id_resep, rsp.img_path as foto_resep, sts.status,
+      bkt.img_path as bukti_pembayaran, pmb.nama, pmb.nomor_telepon, trn.data_pengiriman, sts.last_updated
       FROM transaksi as trn
       INNER JOIN pembeli as pmb ON trn.id_pembeli = pmb.id_pembeli
       INNER JOIN status as sts ON trn.nomor_transaksi = sts.nomor_transaksi
       LEFT JOIN bukti_pembayaran as bkt ON trn.nomor_transaksi = bkt.nomor_transaksi
+      LEFT JOIN resep as rsp ON sts.id_resep = rsp.id_resep
     `)
       .then(res => {
         row = res;
@@ -49,13 +50,14 @@ class Transaksi {
     let row;
     database.query(`
       SELECT
-      trn.nomor_transaksi, sts.jenis, sts.status, bkt.img_path as bukti_pembayaran, 
-      trn.id_pembeli, pmb.nama, pmb.nomor_telepon, trn.data_pengiriman
+      trn.nomor_transaksi, trn.id_pembeli, sts.jenis, rsp.id_resep, rsp.img_path as foto_resep, sts.status,
+      bkt.img_path as bukti_pembayaran, pmb.nama, pmb.nomor_telepon, trn.data_pengiriman, sts.last_updated
       FROM transaksi as trn
       INNER JOIN pembeli as pmb ON trn.id_pembeli = pmb.id_pembeli
       INNER JOIN status as sts ON trn.nomor_transaksi = sts.nomor_transaksi
       LEFT JOIN bukti_pembayaran as bkt ON trn.nomor_transaksi = bkt.nomor_transaksi
-      WHERE status = ${statusID}
+      LEFT JOIN resep as rsp ON sts.id_resep = rsp.id_resep
+      WHERE sts.status = ${statusID}
     `)
       .then(res => {
         row = res;
@@ -63,12 +65,12 @@ class Transaksi {
         row.forEach(async (r, i) => {
           const nomorTR = r.nomor_transaksi;
           const row2 = await database.query(`
-          SELECT 
-          pr.id_produk, pt.jumlah, pr.nama as nama_produk, pr.harga, pr.qty, pr.satuan, pr.img_path
-          FROM produk_transaksi as pt
-          INNER JOIN produk as pr ON pt.id_produk = pr.id_produk
-          WHERE pt.nomor_transaksi = "${nomorTR}"
-        `);
+            SELECT 
+            pr.id_produk, pt.jumlah, pr.nama as nama_produk, pr.harga, pr.qty, pr.satuan, pr.img_path
+            FROM produk_transaksi as pt
+            INNER JOIN produk as pr ON pt.id_produk = pr.id_produk
+            WHERE pt.nomor_transaksi = "${nomorTR}"
+          `);
           r.data_pengiriman = JSON.parse(r.data_pengiriman);
           arr.push(r);
           arr[i].produk = row2;
@@ -102,12 +104,13 @@ class Transaksi {
     let row1, row2, row;
     database.query(`
       SELECT
-      trn.nomor_transaksi, sts.jenis, sts.status, bkt.img_path as bukti_pembayaran, 
-      trn.id_pembeli, pmb.nama, pmb.nomor_telepon, trn.data_pengiriman
+      trn.nomor_transaksi, trn.id_pembeli, sts.jenis, rsp.id_resep, rsp.img_path as foto_resep, sts.status,
+      bkt.img_path as bukti_pembayaran, pmb.nama, pmb.nomor_telepon, trn.data_pengiriman, sts.last_updated
       FROM transaksi as trn
       INNER JOIN pembeli as pmb ON trn.id_pembeli = pmb.id_pembeli
       INNER JOIN status as sts ON trn.nomor_transaksi = sts.nomor_transaksi
       LEFT JOIN bukti_pembayaran as bkt ON trn.nomor_transaksi = bkt.nomor_transaksi
+      LEFT JOIN resep as rsp ON sts.id_resep = rsp.id_resep
       WHERE trn.nomor_transaksi = "${nomorTR}"
     `)
       .then(res => {

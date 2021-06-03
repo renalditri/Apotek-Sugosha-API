@@ -11,7 +11,7 @@ class Status {
   static getAll(result) {
     sql.query(`
       SELECT
-      tr.id_pembeli, st.status, st.jenis, st.nomor_transaksi, tr.data_pengiriman, rs.id_resep, rs.img_path
+      tr.id_pembeli, st.status, st.jenis, st.nomor_transaksi, tr.data_pengiriman, rs.id_resep, rs.img_path, st.last_updated
       FROM status AS st
       INNER JOIN transaksi AS tr ON st.nomor_transaksi = tr.nomor_transaksi
       LEFT JOIN resep AS rs ON st.id_resep = rs.id_resep
@@ -32,7 +32,7 @@ class Status {
   static getByStatus(statusID, result) {
     sql.query(`
       SELECT
-      tr.id_pembeli, st.status, st.jenis, st.nomor_transaksi, tr.data_pengiriman, rs.id_resep, rs.img_path
+      tr.id_pembeli, st.status, st.jenis, st.nomor_transaksi, tr.data_pengiriman, rs.id_resep, rs.img_path, st.last_updated
       FROM status AS st
       INNER JOIN transaksi AS tr ON st.nomor_transaksi = tr.nomor_transaksi
       LEFT JOIN resep AS rs ON st.id_resep = rs.id_resep
@@ -54,7 +54,7 @@ class Status {
   static getFromTransaksi(nomorTR, result) {
     sql.query(`
       SELECT
-      tr.id_pembeli, st.status, st.jenis, st.nomor_transaksi, tr.data_pengiriman, rs.id_resep, rs.img_path
+      tr.id_pembeli, st.status, st.jenis, st.nomor_transaksi, tr.data_pengiriman, rs.id_resep, rs.img_path, st.last_updated
       FROM status AS st
       INNER JOIN transaksi AS tr ON st.nomor_transaksi = tr.nomor_transaksi
       LEFT JOIN resep AS rs ON st.id_resep = rs.id_resep

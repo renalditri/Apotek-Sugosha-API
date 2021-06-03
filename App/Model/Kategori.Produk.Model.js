@@ -1,4 +1,5 @@
 const sql = require("../../db");
+const database = require("../../database");
 
 class KategoriProduk {
   constructor(kategoriProduk) {
@@ -7,30 +8,39 @@ class KategoriProduk {
   }
 
   static getFromCategory(kategoriID, result) {
-    const query =
-    `
-      SELECT 
-      kt.id_kategori, kt.nama as nama_kategori, pr.id_produk, pr.nama as nama_produk, pr.harga, pr.qty, pr.satuan, pr.img_path
-      FROM kategori_produk as kp
-      INNER JOIN kategori as kt ON kp.id_kategori = kt.id_kategori
-      INNER JOIN produk as pr ON kp.id_produk = pr.id_produk
-      WHERE kp.id_kategori = ${kategoriID}
-    `
-    sql.query(query, (err, res) => {
-      if (err) {
-        console.log("error: ", err);
-        result(err, null);
-        return;
-      }
-
-      if (res.length) {
-        console.log("found: ", res);
-        result(null, res);
-        return;
-      }
-
-      result({ kind: "not_found" }, null);
-    });
+    database.query(`SELECT * FROM kategori WHERE id_kategori = ${kategoriID}`)
+      .then(res => {
+        let arr = [];
+        if (!res.length) {
+          result({ kind: "not_found" }, null);
+          return;
+        } else {
+          res.map(async (r, i) => {
+            const kategoriID = r.id_kategori;
+            const row2 = await database.query(`
+              SELECT 
+              ktpr.id_produk, prdk.nama, prdk.harga, prdk.qty, prdk.satuan, prdk.deskripsi,
+              prdk.img_path, prdk.last_updated
+              FROM kategori_produk as ktpr
+              INNER JOIN produk as prdk ON ktpr.id_produk = prdk.id_produk
+              WHERE ktpr.id_kategori = ${kategoriID}
+            `);
+            row2.map(produk => {
+              produk.deskripsi = JSON.parse(produk.deskripsi);
+              produk.last_updated = produk.last_updated.toISOString().split("T")[0];
+            })
+            arr.push(r);
+            arr[i].produk = row2;
+            if (i == (res.length - 1)) {
+              console.log("Found category: ");
+              console.log(arr);
+              result(null, arr)
+              return;
+            };
+          })
+        }
+      })
+    return;
   }
 
   static create() {
