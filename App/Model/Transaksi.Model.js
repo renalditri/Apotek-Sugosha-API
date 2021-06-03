@@ -19,29 +19,67 @@ class Transaksi {
       INNER JOIN status as sts ON trn.nomor_transaksi = sts.nomor_transaksi
       LEFT JOIN bukti_pembayaran as bkt ON trn.nomor_transaksi = bkt.nomor_transaksi
     `)
-    .then(res => {
-      row = res;
-      let arr = [];
-      row.forEach(async (r, i) => {
-        const nomorTR = r.nomor_transaksi;
-        const row2 = await database.query(`
+      .then(res => {
+        row = res;
+        let arr = [];
+        row.forEach(async (r, i) => {
+          const nomorTR = r.nomor_transaksi;
+          const row2 = await database.query(`
           SELECT 
           pr.id_produk, pt.jumlah, pr.nama as nama_produk, pr.harga, pr.qty, pr.satuan, pr.img_path
           FROM produk_transaksi as pt
           INNER JOIN produk as pr ON pt.id_produk = pr.id_produk
           WHERE pt.nomor_transaksi = "${nomorTR}"
         `);
-        r.data_pengiriman = JSON.parse(r.data_pengiriman);
-        arr.push(r);
-        arr[i].produk = row2;
-        if( i == (row.length - 1) ) {
-          console.log("Found transactions: ");
-          console.log(arr);
-          result(null, arr)
-        };
+          r.data_pengiriman = JSON.parse(r.data_pengiriman);
+          arr.push(r);
+          arr[i].produk = row2;
+          if (i == (row.length - 1)) {
+            console.log("Found transactions: ");
+            console.log(arr);
+            result(null, arr)
+          };
+        })
+        return arr;
       })
-      return arr;
-    })
+    return;
+  }
+
+  static getByStatus(statusID, result) {
+    let row;
+    database.query(`
+      SELECT
+      trn.nomor_transaksi, sts.jenis, sts.status, bkt.img_path as bukti_pembayaran, 
+      trn.id_pembeli, pmb.nama, pmb.nomor_telepon, trn.data_pengiriman
+      FROM transaksi as trn
+      INNER JOIN pembeli as pmb ON trn.id_pembeli = pmb.id_pembeli
+      INNER JOIN status as sts ON trn.nomor_transaksi = sts.nomor_transaksi
+      LEFT JOIN bukti_pembayaran as bkt ON trn.nomor_transaksi = bkt.nomor_transaksi
+      WHERE status = ${statusID}
+    `)
+      .then(res => {
+        row = res;
+        let arr = [];
+        row.forEach(async (r, i) => {
+          const nomorTR = r.nomor_transaksi;
+          const row2 = await database.query(`
+          SELECT 
+          pr.id_produk, pt.jumlah, pr.nama as nama_produk, pr.harga, pr.qty, pr.satuan, pr.img_path
+          FROM produk_transaksi as pt
+          INNER JOIN produk as pr ON pt.id_produk = pr.id_produk
+          WHERE pt.nomor_transaksi = "${nomorTR}"
+        `);
+          r.data_pengiriman = JSON.parse(r.data_pengiriman);
+          arr.push(r);
+          arr[i].produk = row2;
+          if (i == (row.length - 1)) {
+            console.log("Found transactions: ");
+            console.log(arr);
+            result(null, arr)
+          };
+        })
+        return arr;
+      })
     return;
   }
 

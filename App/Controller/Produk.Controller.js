@@ -1,7 +1,7 @@
 const Produk = require("../Model/Produk.Model");
 
 exports.getAll = (req, res) => {
-  Produk.getAll((err, data) => {
+  Produk.getAll(req.query, (err, data) => {
     if (err)
       res.status(500).send({
         message:

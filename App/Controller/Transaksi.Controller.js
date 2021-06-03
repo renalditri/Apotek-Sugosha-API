@@ -11,6 +11,22 @@ exports.getAll = (req, res) => {
   })
 }
 
+exports.getByStatus = (req, res) => {
+  Transaksi.getByStatus(req.params.statusID, (err, data) => {
+    if (err) {
+      if (err.kind === "not_found") {
+        res.status(404).send({
+          message: `Not found transaction with id ${req.params.nomorTR}.`
+        });
+      } else {
+        res.status(500).send({
+          message: "Error retrieving transaction with id " + req.params.nomorTR
+        });
+      }
+    } else res.send(data);
+  })
+}
+
 exports.getFromPembeli = (req, res) => {
   Transaksi.getFromPembeli(req.params.pembeliID, (err, data) => {
     if (err)

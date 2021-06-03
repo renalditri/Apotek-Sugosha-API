@@ -1,4 +1,5 @@
 const sql = require("../../db");
+const database = require("../../database");
 
 class Produk {
   constructor(produk) {
@@ -11,18 +12,48 @@ class Produk {
     this.img_path = produk.img_path;
   }
 
-  static getAll(result) {
-    sql.query("SELECT * FROM produk", (err, res) => {
-      if (err) {
-        console.log("error: ", err);
-        result(null, err);
-        return;
-      }
+  static getAll(qparams, result) {
+    let row;
+    const min_stock = (qparams.min_stock !== null && Number.isInteger(parseInt(qparams.min_stock))) ? 
+    qparams.min_stock : '';
+    const max_stock = (qparams.max_stock !== null && Number.isInteger(parseInt(qparams.max_stock))) ? 
+    qparams.max_stock : '';
+    let params = '';
+    if (min_stock !== "") {
+      params += ` WHERE qty >= ${min_stock}`
+      if (max_stock !== "") { params += ` AND qty <= ${max_stock}` }
+    } else if (max_stock !== "") { params += ` WHERE qty <= ${max_stock}` }
 
-      console.log("produk: ", res);
-      result(null, res);
-    });
+    database.query("SELECT * FROM produk" + params)
+      .then(res => {
+        row = res;
+        let arr = [];
+        row.forEach(async (r, i) => {
+          const idProduk = r.id_produk;
+          const row2 = await database.query(`
+            SELECT ktgr.nama
+            FROM produk as prdk
+            INNER JOIN kategori_produk as ktpr ON ktpr.id_produk = prdk.id_produk
+            INNER JOIN kategori as ktgr ON ktpr.id_kategori = ktgr.id_kategori
+            WHERE prdk.id_produk = "${idProduk}"
+          `);
+          r.deskripsi = JSON.parse(r.deskripsi);
+          arr.push(r);
+          const arrRow = row2.map(key => {
+            return key.nama;
+          })
+          arr[i].kategori = arrRow;
+          if (i == (row.length - 1)) {
+            console.log("Found products: ");
+            console.log(arr);
+            result(null, arr)
+          };
+        })
+        return arr;
+      })
+    return;
   }
+
 
   static getOne(produkID, result) {
     sql.query(`SELECT * FROM produk WHERE id_produk = ${produkID}`, (err, res) => {

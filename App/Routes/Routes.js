@@ -17,6 +17,7 @@ module.exports = app => {
   app.get("/kategori/:kategoriID", kategori.getOne);
   app.get("/kategori/:kategoriID/produk", kategori_produk.getFromCategory);
   app.get("/transaksi", transaksi.getAll);
+  app.get("/transaksi/status/:statusID", transaksi.getByStatus);
   app.get("/transaksi/pembeli/:pembeliID", transaksi.getFromPembeli);
   app.get("/transaksi/:nomorTR", transaksi.getOne);
   app.get("/transaksi/produk/:nomorTR", transaksi_produk.getFromTransaksi);
