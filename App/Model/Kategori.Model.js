@@ -17,6 +17,10 @@ class Kategori {
       }
 
       if (res.length) {
+        res.map(r => {
+          if(r.tampil == 1) { r.tampil = true; return r; }
+          else { r.tampil = false; return r; }
+        })
         console.log("found categories: ", res);
         result(null, res);
         return;
@@ -37,6 +41,10 @@ class Kategori {
       }
 
       if (res.length) {
+        res.map(r => {
+          if(r.tampil == 1) { r.tampil = true; return r; }
+          else { r.tampil = false; return r; }
+        })
         console.log("found category: ", res);
         result(null, res);
         return;

@@ -15,10 +15,10 @@ class Produk {
 
   static getAll(qparams, result) {
     let row;
-    const min_stock = (qparams.min_stock !== null && Number.isInteger(parseInt(qparams.min_stock))) ? 
-    qparams.min_stock : '';
-    const max_stock = (qparams.max_stock !== null && Number.isInteger(parseInt(qparams.max_stock))) ? 
-    qparams.max_stock : '';
+    const min_stock = (qparams.min_stock !== null && Number.isInteger(parseInt(qparams.min_stock))) ?
+      qparams.min_stock : '';
+    const max_stock = (qparams.max_stock !== null && Number.isInteger(parseInt(qparams.max_stock))) ?
+      qparams.max_stock : '';
     let params = '';
     if (min_stock !== "") {
       params += ` WHERE qty >= ${min_stock}`
@@ -59,24 +59,33 @@ class Produk {
 
 
   static getOne(produkID, result) {
-    sql.query(`SELECT * FROM produk WHERE id_produk = ${produkID}`, (err, res) => {
-      if (err) {
-        console.log("error: ", err);
-        result(err, null);
-        return;
-      }
-
-      if (res.length) {
-        res[0].deskripsi = JSON.parse(res[0].deskripsi);
-        console.log("found produk: ", res[0]);
-        result(null, res[0]);
-        return;
-      }
-
-      // not found Customer with the id
-      result({ kind: "not_found" }, null);
-    });
+    database.query(`SELECT * FROM produk WHERE id_produk = ${produkID}`)
+      .then(async (res) => {
+        if (res.length) {
+          const row2 = await database.query(`
+          SELECT ktgr.nama
+          FROM produk as prdk
+          INNER JOIN kategori_produk as ktpr ON ktpr.id_produk = prdk.id_produk
+          INNER JOIN kategori as ktgr ON ktpr.id_kategori = ktgr.id_kategori
+          WHERE prdk.id_produk = "${res[0].id_produk}"
+        `);
+          const arrRow = row2.map(key => {
+            return key.nama;
+          })
+          res[0].kategori = arrRow;
+          res[0].deskripsi = JSON.parse(res[0].deskripsi);
+          console.log("found produk: ", res[0]);
+          result(null, res[0]);
+          return;
+        } else {
+          // not found Customer with the id
+          result({ kind: "not_found" }, null);
+          return;
+        }
+      })
+    return;
   }
+
 
   static update(produkID, produk, result) {
     sql.query(

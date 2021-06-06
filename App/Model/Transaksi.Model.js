@@ -24,6 +24,7 @@ class Transaksi {
         row = res;
         let arr = [];
         row.forEach(async (r, i) => {
+          let totalHarga = 0;
           const nomorTR = r.nomor_transaksi;
           const row2 = await database.query(`
           SELECT 
@@ -32,8 +33,12 @@ class Transaksi {
           INNER JOIN produk as pr ON pt.id_produk = pr.id_produk
           WHERE pt.nomor_transaksi = "${nomorTR}"
         `);
+          row2.forEach(r => {
+            totalHarga += (r.jumlah * r.harga);
+          })
           r.data_pengiriman = JSON.parse(r.data_pengiriman);
           arr.push(r);
+          arr[i].total = totalHarga;
           arr[i].produk = row2;
           if (i == (row.length - 1)) {
             console.log("Found transactions: ");
@@ -63,6 +68,7 @@ class Transaksi {
         row = res;
         let arr = [];
         row.forEach(async (r, i) => {
+          let totalHarga = 0;
           const nomorTR = r.nomor_transaksi;
           const row2 = await database.query(`
             SELECT 
@@ -71,8 +77,12 @@ class Transaksi {
             INNER JOIN produk as pr ON pt.id_produk = pr.id_produk
             WHERE pt.nomor_transaksi = "${nomorTR}"
           `);
+          row2.forEach(r => {
+            totalHarga += (r.jumlah * r.harga);
+          })
           r.data_pengiriman = JSON.parse(r.data_pengiriman);
           arr.push(r);
+          arr[i].total = totalHarga;
           arr[i].produk = row2;
           if (i == (row.length - 1)) {
             console.log("Found transactions: ");
@@ -127,12 +137,17 @@ class Transaksi {
         }
       })
       .then(res => {
+        let totalHarga = 0;
         row2 = res;
         row = row1;
         if (row == null) {
           result({ kind: "not_found" }, null);
           return;
         }
+        row2.forEach(r => {
+          totalHarga += (r.jumlah * r.harga);
+        })
+        row.total = totalHarga;
         row.produk = row2;
         console.log("found transaction: ", row);
         result(null, row);
