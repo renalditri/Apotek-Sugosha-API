@@ -7,7 +7,7 @@ class KategoriProduk {
     this.id_kategori = kategoriProduk.id_kategori;
   }
 
-  static getFromCategory(kategoriID, result) {
+  static getFromProduct(kategoriID, result) {
     database.query(`SELECT * FROM kategori WHERE id_kategori = ${kategoriID}`)
       .then(res => {
         let arr = [];
@@ -43,8 +43,50 @@ class KategoriProduk {
     return;
   }
 
-  static create() {
+  static create(newKategoriProduk, result) {
+    database.query('INSERT INTO kategori_produk SET ?', newKategoriProduk)
+      .then(res => {
+        console.log('created product category: ', { ...newKategoriProduk });
+        result(null, { ...newKategoriProduk });
+        return;
+      }, err => {
+        result(err, null);
+        return;
+      })
+  }
 
+  static update(productID, newKategoriProduk, result) {
+    database.query(`UPDATE kategori_produk SET id_kategori = ${newKategoriProduk} WHERE id_produk = ${productID}`)
+      .then(res => {
+        if (res.affectedRows == 0) {
+          // not found product with the id
+          result({ kind: "not_found" }, null);
+          return;
+        }
+        console.log('updated product category: ', { id: productID, ...newKategoriProduk });
+        result(null, { id: productID, ...newKategoriProduk });
+        return;
+      }, err => {
+        result(err, null);
+        return;
+      })
+  }
+
+  static delete(productID, result) {
+    database.query(`DELETE FROM kategori_produk WHERE id_produk = ${productID}`)
+      .then(res => {
+        if (res.affectedRows == 0) {
+          result({ kind: "not_found" }, null);
+          return;
+        }
+
+        console.log("deleted product category with id: ", productID);
+        result(null, res);
+      }, err => {
+        console.log("error: ", err);
+        result(null, err);
+        return;
+      })
   }
 }
 

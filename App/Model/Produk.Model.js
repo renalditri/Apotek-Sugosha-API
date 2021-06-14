@@ -3,14 +3,27 @@ const database = require("../../database");
 
 class Produk {
   constructor(produk) {
-    this.id_produk = produk.id_produk;
-    this.nama = produk.nama;
-    this.harga = produk.harga;
-    this.qty = produk.qty;
-    this.satuan = produk.satuan;
-    this.deskripsi = produk.deskripsi;
-    this.img_path = produk.img_path;
-    this.last_updated = produk.last_updated;
+    if (produk.nama && produk.nama != '') {
+      this.nama = produk.nama;
+    }
+    if (produk.harga && parseInt(produk.harga) >= 0) {
+      this.harga = parseInt(produk.harga);
+    }
+    if (produk.qty && parseInt(produk.qty) >= 0) {
+      this.qty = produk.qty;
+    }
+    if (produk.satuan && produk.satuan != '') {
+      this.satuan = produk.satuan;
+    }
+    if (produk.deskripsi && produk.deskripsi != '') {
+      this.deskripsi = produk.deskripsi;
+    }
+    if (produk.img_path && produk.img_path != '') {
+      this.img_path = produk.img_path;
+    }
+    if (produk.last_updated && produk.last_updated != '') {
+      this.last_updated = produk.last_updated;
+    }
   }
 
   static getAll(qparams, result) {
@@ -32,19 +45,20 @@ class Produk {
         row.forEach(async (r, i) => {
           const idProduk = r.id_produk;
           const row2 = await database.query(`
-            SELECT ktgr.nama
+            SELECT ktgr.id_kategori, ktgr.nama, ktgr.tampil
             FROM produk as prdk
             INNER JOIN kategori_produk as ktpr ON ktpr.id_produk = prdk.id_produk
             INNER JOIN kategori as ktgr ON ktpr.id_kategori = ktgr.id_kategori
             WHERE prdk.id_produk = "${idProduk}"
           `);
+          row2.map(r => {
+            if (r.tampil == 1) { r.tampil = true; return r; }
+            else { r.tampil = false; return r; }
+          })
           r.deskripsi = JSON.parse(r.deskripsi);
           r.last_updated = r.last_updated.toISOString().split("T")[0];
           arr.push(r);
-          const arrRow = row2.map(key => {
-            return key.nama;
-          })
-          arr[i].kategori = arrRow;
+          arr[i].kategori = row2;
           if (i == (row.length - 1)) {
             console.log("Found products: ");
             console.log(arr);
@@ -63,16 +77,17 @@ class Produk {
       .then(async (res) => {
         if (res.length) {
           const row2 = await database.query(`
-          SELECT ktgr.nama
+          SELECT ktgr.id_kategori, ktgr.nama, ktgr.tampil
           FROM produk as prdk
           INNER JOIN kategori_produk as ktpr ON ktpr.id_produk = prdk.id_produk
           INNER JOIN kategori as ktgr ON ktpr.id_kategori = ktgr.id_kategori
           WHERE prdk.id_produk = "${res[0].id_produk}"
         `);
-          const arrRow = row2.map(key => {
-            return key.nama;
+          row2.map(r => {
+            if (r.tampil == 1) { r.tampil = true; return r; }
+            else { r.tampil = false; return r; }
           })
-          res[0].kategori = arrRow;
+          res[0].kategori = row2;
           res[0].deskripsi = JSON.parse(res[0].deskripsi);
           console.log("found produk: ", res[0]);
           result(null, res[0]);
@@ -86,28 +101,60 @@ class Produk {
     return;
   }
 
+  static create(newProduk, result) {
+    database.query('INSERT INTO produk SET ?, last_updated = now()', newProduk)
+      .then(res => {
+        console.log('created produk: ', { id: res.insertId, ...newProduk });
+        result(null, { id: res.insertId, ...newProduk });
+        return;
+      }, err => {
+        result(err, null);
+        return;
+      })
+  }
 
   static update(produkID, produk, result) {
-    sql.query(
-      'UPDATE produk SET nama = ?, harga = ?, qty = ?, satuan = ?, deskripsi = ? WHERE id_produk = ?, last_updated = current_date()',
-      [produk.nama, produk.harga, produk.qty, produk.satuan, produk.deskripsi, produkID],
-      (err, res) => {
-        if (err) {
-          console.log("error: ", err);
-          result(null, err);
+    if (!produk || produk == '') {
+      sql.query(
+        'UPDATE produk SET last_updated = now() WHERE id_produk = ?', produkID,
+        (err, res) => {
+          if (err) {
+            console.log("error: ", err);
+            result(null, err);
+            return;
+          }
+          if (res.affectedRows == 0) {
+            // not found product with the id
+            result({ kind: "not_found" }, null);
+            return;
+          }
+          console.log("updated product with id: " + produkID);
+          result(null, { id: produkID });
           return;
         }
+      );
+    } else {
+      sql.query(
+        'UPDATE produk SET ?, last_updated = now() WHERE id_produk = ?',
+        [produk, produkID],
+        (err, res) => {
+          if (err) {
+            console.log("error: ", err);
+            result(null, err);
+            return;
+          }
 
-        if (res.affectedRows == 0) {
-          // not found product with the id
-          result({ kind: "not_found" }, null);
-          return;
+          if (res.affectedRows == 0) {
+            // not found product with the id
+            result({ kind: "not_found" }, null);
+            return;
+          }
+
+          console.log("updated product: ", { id: produkID, ...produk });
+          result(null, { id: produkID, ...produk });
         }
-
-        console.log("updated product: ", { id: id, ...produk });
-        result(null, { id: id, ...produk });
-      }
-    );
+      );
+    }
   }
 }
 

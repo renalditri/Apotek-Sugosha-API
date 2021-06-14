@@ -9,13 +9,26 @@ module.exports = app => {
   const resep = require("../Controller/Resep.Controller");
   const status = require("../Controller/Status.Controller");
 
-  app.get("/produk", produk.getAll);
-  app.get("/produk/:productID", produk.getOne);
   app.get("/pembeli", pembeli.getAll); 
-  app.get("/keranjang/:pembeliID", keranjang.getFromCustomer); //produk jadi json
+  app.get("/pembeli/:pembeliID", pembeli.getOne);
+  app.post("/pembeli", pembeli.create);
+  app.put("/pembeli/:pembeliID", pembeli.update);
+
   app.get("/kategori", kategori.getAll);
   app.get("/kategori/:kategoriID", kategori.getOne);
-  app.get("/kategori/:kategoriID/produk", kategori_produk.getFromCategory); //produk jadi json
+  app.get("/kategori/produk/:productID", kategori_produk.getFromProduct); //produk jadi json
+  app.post("/kategori", kategori.create);
+  app.put("/kategori/:kategoriID", kategori.update);
+
+  app.get("/keranjang/:pembeliID", keranjang.getFromCustomer); //produk jadi json
+  app.post("/keranjang", keranjang.create);
+  app.put("/keranjang/:pembeliID/:produkID", keranjang.update);
+
+  app.post("/produk", produk.create);
+  app.get("/produk", produk.getAll);
+  app.get("/produk/:productID", produk.getOne);
+  app.put("/produk/:productID", produk.update);
+  
   app.get("/transaksi", transaksi.getAll);
   app.get("/transaksi/status/:statusID", transaksi.getByStatus);
   app.get("/transaksi/pembeli/:pembeliID", transaksi.getFromPembeli);

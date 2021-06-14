@@ -1,0 +1,30 @@
+** Yang butuh aneh aneh
+
+insert transaksi (non-resep)
+- insert ke transaksi + generate id transaksi
+- insert ke status
+- insert ke produk_transaksi
+
+insert transaksi (resep)
+- insert ke transaksi + generate id transaksi
+- insert ke status
+- insert ke resep
+
+update transaksi
+- insert bukti_pembayaran
+- update status
+- update no hp di data pengiriman
+- update produk_transaksi
+
+insert produk DONE
+- insert ke produk dan kategori_produk DONE
+
+
+** Yang ga butuh aneh aneh
+insert kategori DONE
+insert pembeli DONE
+insert keranjang DONE
+update kategori DONE
+update produk
+update pembeli DONE
+update keranjang DONE
