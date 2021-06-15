@@ -30,9 +30,11 @@ exports.getOne = (req, res) => {
 }
 
 exports.create = (req, res) => {
+  console.log(req.body)
   const validate = validateData(req.body, res, true);
   if (!validate) { return; }
   const promise = new Promise((resolve, reject) => {
+    delete validate.kategori;
     const validated_product = validateProduct(validate, res, true)
     if (!validated_product) { return; }
     Produk.create(validated_product, (err, data) => {
@@ -48,7 +50,7 @@ exports.create = (req, res) => {
   })
   promise.then(resolve => {
     let success_kategori = [];
-    const validated_category = validateCategory(req.body.kategori, resolve, res, true);
+    const validated_category = validateCategory(req.body.kategori, resolve.id, res, true);
     if (!validated_category) { return; }
     validated_category.forEach((val, i) => {
       KategoriProduk.create(val, (err, data) => {
