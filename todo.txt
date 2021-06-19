@@ -15,7 +15,7 @@ insert transaksi (resep) DONE
 update transaksi
 - insert bukti_pembayaran PISAH ROUTE /upload/bukti UPLOAD GAMBAR
 - update status PISAH ROUTE /status DONE
-- update no hp di data pengiriman /transaksi
+- update no hp di data pengiriman /transaksi DONE
 - insert produk_transaksi /resep DONE
 
 insert produk DONE

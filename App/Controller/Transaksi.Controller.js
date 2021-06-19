@@ -158,6 +158,7 @@ exports.updateDataPengiriman = (req, res) => {
   const keys = ["data_pengiriman"];
   const types = ["object"];
   const validated = validasi.Validasi(req.body, keys, types);
+  validated.data_pengiriman = JSON.stringify(validated.data_pengiriman);
   Transaksi.update(req.params.nomorTR, validated, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
