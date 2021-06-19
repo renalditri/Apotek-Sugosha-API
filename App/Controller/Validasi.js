@@ -17,7 +17,7 @@ exports.Validasi = (datas, keys, types, isPost) => {
         let match = false;
         types[existKey].forEach(type => {
           if (type === "number") {
-            if (!isNaN(val)) { val = parseInt(val) }
+            if (!isNaN(val) && !isNaN(parseInt(val))) { val = parseInt(val) }
           }
           if (typeof val === type) {
             match = true;
@@ -34,7 +34,7 @@ exports.Validasi = (datas, keys, types, isPost) => {
       } else { valid = false }
     } else { valid = false }
     if (!valid) {
-      console.log(key + ' ' + val + ' ' + typeof val + ' ' + types[existKey]);
+      console.log('Key: ' + key + ', Val: ' + val + ', Type: ' + typeof val + ', Needed Type: ' + types[existKey]);
       dataValidated.invalid = true;
       dataValidated.message = "Data yang dikirim tidak valid, mohon dicek kembali"
       return;

@@ -33,13 +33,13 @@ class Keranjang {
         final.nama_pembeli = res[0].nama_pembeli;
         res.forEach(r => {
           produk.push({
-            id_produk : r.id_produk,
-            jumlah : r.jumlah,
-            nama_produk : r.nama_produk,
-            harga : r.harga,
-            qty : r.qty,
-            satuan : r.satuan,
-            img_path : r.img_path,
+            id_produk: r.id_produk,
+            jumlah: r.jumlah,
+            nama_produk: r.nama_produk,
+            harga: r.harga,
+            qty: r.qty,
+            satuan: r.satuan,
+            img_path: r.img_path,
           })
         })
         final.produk = produk;
@@ -54,23 +54,26 @@ class Keranjang {
   }
 
   static create(newKeranjang, result) {
-    if(sql.query(`
+    database.query(`
     SELECT * FROM keranjang WHERE id_pembeli = ? AND id_produk = ?
-    `, [newKeranjang.id_pembeli, newKeranjang.id_produk])) {
-      result({ kind: "exists" }, null);
-      return;
-    }
-
-    sql.query('INSERT INTO keranjang SET ?', newKeranjang, (err, res) => {
-      if (err) {
-        console.log("error: ", err);
-        result(err, null);
-        return;
-      }
-      console.log('created cart: ', { ...newKeranjang });
-      result(null, { ...newKeranjang });
-      return;
-    })
+    `, [newKeranjang.id_pembeli, newKeranjang.id_produk])
+      .then(res => {
+        if(!res.length) {
+          sql.query('INSERT INTO keranjang SET ?', newKeranjang, (err, res) => {
+            if (err) {
+              console.log("error: ", err);
+              result(err, null);
+              return;
+            }
+            console.log('created cart: ', { ...newKeranjang });
+            result(null, { ...newKeranjang });
+            return;
+          })
+        } else {
+          result({ kind: "exists" }, null);
+          return;
+        }
+      })
   }
 
   static update(pembeliID, produkID, newKeranjang, result) {
@@ -100,7 +103,21 @@ class Keranjang {
     })
   }
 
-  static delete() {
+  static delete(pembeliID, productID, result) {
+    database.query(`DELETE FROM keranjang WHERE id_pembeli = ${pembeliID} AND id_produk = ${productID}`)
+      .then(res => {
+        if (res.affectedRows == 0) {
+          result({ kind: "not_found" }, null);
+          return;
+        }
+
+        console.log("deleted product cart with user id: " + pembeliID + " and product id: " + productID);
+        result(null, res);
+      }, err => {
+        console.log("error: ", err);
+        result(null, err);
+        return;
+      })
 
   }
 }

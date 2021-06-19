@@ -156,27 +156,41 @@ class Transaksi {
     return;
   }
 
-  static update(nomorTR, transaksi, result) {
-    sql.query(
-      "UPDATE transaksi SET data_pengiriman = ? WHERE nomor_transaksi = ?",
-      [transaksi.data_pengiriman, nomorTR],
-      (err, res) => {
-        if (err) {
-          console.log("error: ", err);
-          result(null, err);
-          return;
-        }
-
-        if (res.affectedRows == 0) {
-          // not found product with the id
-          result({ kind: "not_found" }, null);
-          return;
-        }
-
-        console.log("updated transaction: ", { id: nomorTR, ...transaksi });
-        result(null, { id: nomorTR, ...transaksi });
+  static create(transaksi, result) {
+    sql.query('INSERT INTO transaksi SET ?', transaksi, (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(err, null);
+        return;
       }
-    );
+      console.log('created transaksi: ', { id: res.insertId, ...transaksi });
+      result(null, { id: res.insertId, ...transaksi });
+      return;
+    })
+  }
+
+  static update(nomorTR, transaksi, result) {
+    sql.query('UPDATE transaksi SET ? WHERE nomor_transaksi = ?', [transaksi, nomorTR], (err, res) => {
+      if(err) {
+        console.log("error: ", err);
+        result(err, null);
+        return;
+      }
+
+      if (res.affectedRows == 0) {
+        result({ kind: "not_found" }, null);
+        return;
+      }
+
+      if (res == null) {
+        result({ kind: "not_found" }, null);
+        return;
+      }
+
+      console.log('updated status: ', transaksi);
+      result(null, {id: nomorTR, ...transaksi});
+      return;
+    })
   }
 }
 

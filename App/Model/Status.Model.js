@@ -70,6 +70,67 @@ class Status {
       result(null, res);
     })
   }
+
+  static create(status, result) {
+    sql.query('INSERT INTO status SET ?, last_updated = now()', status, (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(err, null);
+        return;
+      }
+      console.log('created status: ', { id: res.insertId, ...status });
+      result(null, { id: res.insertId, ...status });
+      return;
+    })
+  }
+
+  static updateByResep(resepID, result) {
+    sql.query('UPDATE status SET status = 1 WHERE id_resep = ?', resepID, (err, res) => {
+      if(err) {
+        console.log("error: ", err);
+        result(err, null);
+        return;
+      }
+
+      if (res.affectedRows == 0) {
+        result({ kind: "not_found" }, null);
+        return;
+      }
+
+      if (res == null) {
+        result({ kind: "not_found" }, null);
+        return;
+      }
+
+      console.log('updated status: ', 1);
+      result(null, {id: res.affectedRows, status: 1});
+      return;
+    })
+  }
+
+  static update(nomorTR, status, result) {
+    sql.query('UPDATE status SET status = ? WHERE nomor_transaksi = ?', [status, nomorTR], (err, res) => {
+      if(err) {
+        console.log("error: ", err);
+        result(err, null);
+        return;
+      }
+
+      if (res.affectedRows == 0) {
+        result({ kind: "not_found" }, null);
+        return;
+      }
+
+      if (res == null) {
+        result({ kind: "not_found" }, null);
+        return;
+      }
+
+      console.log('updated status: ', status);
+      result(null, {nomor_transaksi: nomorTR, status: status.status});
+      return;
+    })
+  }
 }
 
 module.exports = Status;

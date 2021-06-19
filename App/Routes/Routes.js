@@ -23,20 +23,23 @@ module.exports = app => {
   app.get("/keranjang/:pembeliID", keranjang.getFromCustomer); //produk jadi json
   app.post("/keranjang", keranjang.create);
   app.put("/keranjang/:pembeliID/:produkID", keranjang.update);
+  app.delete("/keranjang/:pembeliID/:produkID", keranjang.delete);
 
   app.post("/produk", produk.create);
   app.get("/produk", produk.getAll);
   app.get("/produk/:productID", produk.getOne);
   app.put("/produk/:productID", produk.update);
   
+  app.post("/transaksi", transaksi.create);
+  app.post("/transaksi/produk", transaksi.insertProdukTransaksi);
+  app.post("/transaksi/resep", transaksi.createWithResep);
+  app.post("/upload/bukti", transaksi.insertBukti);
+  app.put("/status/:nomorTR", transaksi.updateStatus);
+  app.put("/transaksi/:nomorTR", transaksi.updateDataPengiriman);
   app.get("/transaksi", transaksi.getAll);
   app.get("/transaksi/status/:statusID", transaksi.getByStatus);
   app.get("/transaksi/pembeli/:pembeliID", transaksi.getFromPembeli);
   app.get("/transaksi/:nomorTR", transaksi.getOne);
-  app.get("/transaksi/produk/:nomorTR", transaksi_produk.getFromTransaksi);
-  app.get("/resep/:resepID", resep.getOne);
   app.get("/status/:nomorTR", status.getFromTransaksi);
-  app.get("/status/status/:statusID", status.getByStatus);
-  app.get("/status", status.getAll);
 
 }

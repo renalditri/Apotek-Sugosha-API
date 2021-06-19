@@ -9,7 +9,7 @@ class Resep {
 
   static getOne(resepID, result) {
     sql.query(`SELECT * FROM resep WHERE id_resep = "${resepID}"`, (err, res) => {
-      if(err) {
+      if (err) {
         console.log("error: ", err);
         result(null, err);
         return
@@ -17,6 +17,19 @@ class Resep {
       console.log("recipe: ", res);
       result(null, res);
     });
+  }
+
+  static create(resep, result) {
+    sql.query('INSERT INTO resep SET ?', resep, (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(err, null);
+        return;
+      }
+      console.log('created resep: ', { id: res.insertId, ...resep });
+      result(null, { id: res.insertId, ...resep });
+      return;
+    })
   }
 }
 
