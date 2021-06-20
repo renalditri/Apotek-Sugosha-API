@@ -30,7 +30,13 @@ exports.getOne = (req, res) => {
 }
 
 exports.create = (req, res) => {
-  console.log(req.body)
+  if (!req.body && !req.file) {
+    res.status(400).send({
+      message: "Error with data/files, please make sure your data is correct"
+    })
+    return;
+  }
+  req.body.img_path = req.file.path;
   const validate = validateData(req.body, res, true);
   if (!validate) { return; }
   const promise = new Promise((resolve, reject) => {

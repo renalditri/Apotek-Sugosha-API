@@ -31,6 +31,13 @@ exports.getOne = (req, res) => {
 exports.create = (req, res) => {
   const keys = ["nama", "img_path", "tampil"];
   const types = ["string", "string", "boolean"];
+  if (!req.body && !req.file) {
+    res.status(400).send({
+      message: "Error with data/files, please make sure your data is correct"
+    })
+    return;
+  }
+  req.body.img_path = req.file.path;
   const validated = validasi.Validasi(req.body, keys, types, true);
   if (validated.invalid) {
     res.status(400).send({

@@ -107,7 +107,16 @@ exports.insertProdukTransaksi = (req, res) => {
 exports.insertBukti = (req, res) => {
   const keys = ["nomor_transaksi", "img_path"];
   const types = ["number", "string"];
-  const validated = validasi.Validasi(req.body, keys, types, true)
+  if (!req.body && !req.file) {
+    res.status(400).send({
+      message: "Error with data/files, please make sure your data is correct"
+    })
+    return;
+  }
+  const validated = validasi.Validasi({
+    nomor_transaksi: req.body.nomor_transaksi,
+    img_path: req.file.path
+  }, keys, types, true)
   if (validated.invalid) {
     res.status(400).send({
       message: validated.message
@@ -125,7 +134,21 @@ exports.insertBukti = (req, res) => {
           message: "Error creating bukti."
         });
       }
-    } else res.send(data);
+    } else {
+      Status.update(validated.nomor_transaksi, { status: 2 }, (err, response) => {
+        if (err) {
+          if (err.kind === "not_found") {
+            res.status(404).send({
+              message: `Not found status with transaction id: ${req.params.nomorTR}.`
+            });
+          } else {
+            res.status(500).send({
+              message: "Error updating status with transaction id " + req.params.nomorTR
+            });
+          }
+        } else res.send(data);
+      });
+    }
   })
 }
 
@@ -251,13 +274,22 @@ exports.create = (req, res) => {
 }
 
 exports.createWithResep = (req, res) => {
+  if (!req.body && !req.file) {
+    res.status(400).send({
+      message: "Error with data/files, please make sure your data is correct"
+    })
+    return;
+  }
+  req.body.foto_resep = req.file.path;
   const transaction = validateWithResep(req.body, true, res);
   if (!transaction) { return; }
   let result_data = {};
   const insertTransaction = (resolve, reject) => {
+    const data_pengiriman = (typeof transaction.data_pengiriman == 'string') ? 
+    transaction.data_pengiriman : JSON.stringify(transaction.data_pengiriman);
     let transaksi = {
       id_pembeli: transaction.id_pembeli,
-      data_pengiriman: JSON.stringify(transaction.data_pengiriman),
+      data_pengiriman: data_pengiriman,
     };
     Transaksi.create(transaksi, (err, data) => {
       if (err) {
@@ -324,7 +356,7 @@ exports.createWithResep = (req, res) => {
 
 function validate(data, isPost, res) {
   const keys = ["id_pembeli", "data_pengiriman", "status", "jenis", "produk"];
-  const types = ["number", "object", "number", "number", ["number", "object"]];
+  const types = ["number", ["object", "string"], "number", "number", ["number", "object"]];
   const validated = validasi.Validasi(data, keys, types, isPost)
   if (validated.invalid) {
     if (validated.invalid) {
@@ -341,7 +373,7 @@ function validate(data, isPost, res) {
 
 function validateWithResep(data, isPost, res) {
   const keys = ["id_pembeli", "data_pengiriman", "status", "jenis", "foto_resep"];
-  const types = ["number", "object", "number", "number", "string"];
+  const types = ["number", ["object", "string"], "number", "number", "string"];
   const validated = validasi.Validasi(data, keys, types, isPost)
   if (validated.invalid) {
     if (validated.invalid) {

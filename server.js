@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 require("./App/Routes/Routes")(app);
-
+app.use('/img', express.static('./img'));
 // simple route
 app.get("/", (req, res) => {
   res.json({ message: "Application test." });
