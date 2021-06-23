@@ -1,11 +1,16 @@
 const multer = require('multer');
 
+function removeSpace(string) {
+  const text = `${Date.now()}-${string.replace(" ", "-")}`
+  return text;
+}
+
 const buktiStorage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, './img/bukti/');
   },
   filename: function (req, file, cb) {
-    cb(null, `bukti-${file.originalname}`);
+    cb(null, `bukti-${removeSpace(file.originalname)}`);
   }
 });
 
@@ -14,7 +19,7 @@ const resepStorage = multer.diskStorage({
     cb(null, './img/resep/');
   },
   filename: function (req, file, cb) {
-    cb(null, `resep-${file.originalname}`);
+    cb(null, `resep-${removeSpace(file.originalname)}`);
   }
 });
 
@@ -23,7 +28,7 @@ const produkStorage = multer.diskStorage({
     cb(null, './img/produk/');
   },
   filename: function (req, file, cb) {
-    cb(null, `produk-${file.originalname}`);
+    cb(null, `produk-${removeSpace(file.originalname)}`);
   }
 });
 
@@ -32,7 +37,8 @@ const kategoriStorage = multer.diskStorage({
     cb(null, './img/kategori/');
   },
   filename: function (req, file, cb) {
-    cb(null, `kategori-${file.originalname}`);
+    console.log(removeSpace(file.originalname))
+    cb(null, `kategori-${removeSpace(file.originalname)}`);
   }
 });
 

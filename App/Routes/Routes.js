@@ -21,7 +21,7 @@ module.exports = app => {
   app.get("/kategori/:kategoriID", kategori.getOne);
   app.get("/kategori/produk/:productID", kategori_produk.getFromProduct); //produk jadi json
   app.post("/kategori", imageUpload.uploadKategori, kategori.create);
-  app.put("/kategori/:kategoriID", kategori.update);
+  app.put("/kategori/:kategoriID", imageUpload.uploadKategori, kategori.update);
 
   app.get("/keranjang/:pembeliID", keranjang.getFromCustomer); //produk jadi json
   app.post("/keranjang", keranjang.create);

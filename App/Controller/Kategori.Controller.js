@@ -58,6 +58,12 @@ exports.create = (req, res) => {
 }
 
 exports.update = (req, res) => {
+  if (!req.body && !req.file) {
+    res.status(400).send({
+      message: "Error with data/files, please make sure your data is correct"
+    })
+    return;
+  } else if(req.file) { req.body.img_path = req.file.path; }
   if (req.body.tampil) {
     req.body.tampil = (typeof req.body.tampil === 'boolean') ? req.body.tampil :
       (req.body.tampil === 'true') ? true : (req.body.tampil === 'false') ? false : '';
