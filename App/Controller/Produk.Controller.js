@@ -78,6 +78,12 @@ exports.create = (req, res) => {
 }
 
 exports.update = (req, res) => {
+  if (!req.body && !req.file) {
+    res.status(400).send({
+      message: "Error with data/files, please make sure your data is correct"
+    })
+    return;
+  } else if(req.file) { req.body.img_path = req.file.path; }
   const productID = req.params.productID;
   let response = { id_produk: productID }
   const validate = validateData(req.body, res, false);

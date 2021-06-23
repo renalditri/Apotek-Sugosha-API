@@ -1,4 +1,6 @@
 module.exports = app => {
+  const multer = require('multer');
+  const upload = multer();
   const produk = require("../Controller/Produk.Controller");
   const pembeli = require("../Controller/Pembeli.Controller");
   const keranjang = require("../Controller/Keranjang.Controller");
@@ -10,7 +12,7 @@ module.exports = app => {
   const status = require("../Controller/Status.Controller");
   const imageUpload = require("../Controller/Image.Controller");
 
-  app.get("/pembeli", pembeli.getAll); 
+  app.get("/pembeli", pembeli.getAll);
   app.get("/pembeli/:pembeliID", pembeli.getOne);
   app.post("/pembeli", pembeli.create);
   app.put("/pembeli/:pembeliID", pembeli.update);
@@ -29,8 +31,8 @@ module.exports = app => {
   app.post("/produk", imageUpload.uploadProduk, produk.create);
   app.get("/produk", produk.getAll);
   app.get("/produk/:productID", produk.getOne);
-  app.put("/produk/:productID", produk.update);
-  
+  app.put("/produk/:productID", imageUpload.uploadProduk, produk.update);
+
   app.post("/transaksi", transaksi.create);
   app.post("/transaksi/produk", transaksi.insertProdukTransaksi);
   app.post("/transaksi/resep", imageUpload.uploadResep, transaksi.createWithResep);
