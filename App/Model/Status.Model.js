@@ -109,7 +109,7 @@ class Status {
   }
 
   static update(nomorTR, status, result) {
-    sql.query('UPDATE status SET status = ? WHERE nomor_transaksi = ?', [status.status, nomorTR], (err, res) => {
+    sql.query('UPDATE status SET status = ? WHERE nomor_transaksi = ?', [status, nomorTR], (err, res) => {
       if(err) {
         console.log("error: ", err);
         result(err, null);
@@ -127,7 +127,7 @@ class Status {
       }
 
       console.log('updated status: ', status);
-      result(null, {nomor_transaksi: nomorTR, status: status.status});
+      result(null, {nomor_transaksi: nomorTR, status: status});
       return;
     })
   }

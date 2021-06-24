@@ -94,7 +94,10 @@ exports.insertProdukTransaksi = (req, res) => {
         sent_data.push(data);
         if ((i + 1) == validated.length) {
           Status.update(produk_transaksi.nomor_transaksi, 1, (err, data) => {
-            console.log(sent_data);
+            if(err) {
+              console.log(err)
+            }
+            console.log(data);
             res.send(sent_data);
             return;
           })
