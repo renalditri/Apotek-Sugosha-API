@@ -1,0 +1,25 @@
+API untuk pembeli:
+
+Authenthication haha nanti
+
+Kategori
+- getAll
+- getOne
+
+Produk
+- getAll
+- getOne
+
+Keranjang
+- getById
+- post
+- update
+- delete
+
+Pembeli
+- getById
+- update
+
+Transaksi
+- postTransaksi
+- updateStatus

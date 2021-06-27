@@ -156,6 +156,28 @@ class Produk {
       );
     }
   }
+
+  static updateQty(produkID, total, isAdd, result) {
+    database.query('SELECT * FROM produk WHERE id_produk = ?', produkID)
+      .then(data => {
+        const currentQty = (isAdd) ? data[0].qty + total : data[0].qty - total;
+        sql.query('UPDATE produk SET last_updated = now(), qty = ? WHERE id_produk = ?', [currentQty, produkID], (err, res) => {
+          if (err) {
+            console.log("error: ", err);
+            result(null, err);
+            return;
+          }
+          if (res.affectedRows == 0) {
+            // not found product with the id
+            result({ kind: "not_found" }, null);
+            return;
+          }
+          console.log("updated product with id: " + produkID);
+          result(null, { id: produkID, prevQty: data[0].qty, nowQty: currentQty });
+          return;
+        })
+      })
+  }
 }
 
 module.exports = Produk;

@@ -43,7 +43,8 @@ class Keranjang {
           })
         })
         final.produk = produk;
-        console.log("found produk: ", final);
+        console.log("search: ", pembeliID);
+        console.log("found cart: ", final);
         result(null, final);
         return;
       }
@@ -58,7 +59,7 @@ class Keranjang {
     SELECT * FROM keranjang WHERE id_pembeli = ? AND id_produk = ?
     `, [newKeranjang.id_pembeli, newKeranjang.id_produk])
       .then(res => {
-        if(!res.length) {
+        if (!res.length) {
           sql.query('INSERT INTO keranjang SET ?', newKeranjang, (err, res) => {
             if (err) {
               console.log("error: ", err);
@@ -70,8 +71,25 @@ class Keranjang {
             return;
           })
         } else {
-          result({ kind: "exists" }, null);
-          return;
+          sql.query(`
+          UPDATE keranjang 
+          SET jumlah = ? 
+          WHERE id_pembeli = ? AND id_produk = ?`, 
+          [newKeranjang.jumlah, newKeranjang.id_pembeli, newKeranjang.id_produk],
+          (err, res) => {
+            if (err) {
+              console.log("error: ", err);
+              result(err, null);
+              return;
+            }
+            if(res.affectedRows == 0) {
+              console.log('not found')
+              result({ kind: "not_found" }, null);
+              return;
+            }
+            result(null, { exists: true, ...newKeranjang});
+            return;
+          })
         }
       })
   }

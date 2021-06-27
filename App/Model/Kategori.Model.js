@@ -1,4 +1,5 @@
 const sql = require("../../db");
+const database = require("../../database");
 
 class Kategori {
   constructor(kategori) {
@@ -39,44 +40,56 @@ class Kategori {
 
   static getOne(kategoriID, result) {
     const query = `SELECT * FROM kategori WHERE id_kategori = ${kategoriID}`
-    sql.query(query, (err, res) => {
+    database.query(query)
+      .then(res => {
+        if (res.length) {
+          res.map(r => {
+            if (r.tampil == 1) { r.tampil = true; return r; }
+            else { r.tampil = false; return r; }
+          })
+          return res;
+        } else {
+          result({ kind: "not_found" }, null);
+          return false;
+        }
+      }, err => {
+        console.log("error: ", err);
+        result(err, null);
+        return false;
+      })
+      .then(async res => {
+        if (res) {
+          const produk = await database.query(`
+            SELECT 
+            ktpr.id_produk, prdk.nama, prdk.harga, prdk.qty, prdk.satuan, prdk.deskripsi,
+            prdk.img_path, prdk.last_updated
+            FROM kategori_produk as ktpr
+            INNER JOIN produk as prdk ON ktpr.id_produk = prdk.id_produk
+            WHERE ktpr.id_kategori = ${kategoriID}
+          `)
+          res[0].produk = produk;
+          console.log("Found category: ", res[0]);
+          result(null, res[0]);
+        }
+      })
+  }
+
+  static create(newKategori, result) {
+    sql.query('INSERT INTO kategori SET ?', newKategori, (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(err, null);
         return;
       }
-
-      if (res.length) {
-        res.map(r => {
-          if (r.tampil == 1) { r.tampil = true; return r; }
-          else { r.tampil = false; return r; }
-        })
-        console.log("found category: ", res);
-        result(null, res);
-        return;
-      }
-
-      // not found category with the id
-      result({ kind: "not_found" }, null);
-    });
-  }
-
-  static create(newKategori, result) {
-    sql.query('INSERT INTO kategori SET ?', newKategori, (err, res) => {
-      if(err) {
-        console.log("error: ", err);
-        result(err, null);
-        return;
-      }
-      console.log('created kategori: ', {id: res.insertId, ...newKategori});
-      result(null, {id: res.insertId, ...newKategori});
+      console.log('created kategori: ', { id: res.insertId, ...newKategori });
+      result(null, { id: res.insertId, ...newKategori });
       return;
     })
   }
 
   static update(kategoriID, newKategori, result) {
     sql.query('UPDATE kategori SET ? WHERE id_kategori = ?', [newKategori, kategoriID], (err, res) => {
-      if(err) {
+      if (err) {
         console.log("error: ", err);
         result(err, null);
         return;
@@ -94,7 +107,7 @@ class Kategori {
       }
 
       console.log('updated kategori: ', newKategori);
-      result(null, {id: kategoriID, ...newKategori});
+      result(null, { id: kategoriID, ...newKategori });
       return;
     })
   }

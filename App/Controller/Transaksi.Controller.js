@@ -1,6 +1,7 @@
 const Transaksi = require("../Model/Transaksi.Model");
 const Status = require("../Model/Status.Model");
 const TransaksiProduk = require("../Model/Transaksi.Produk.Model");
+const Produk = require("../Model/Produk.Model");
 const Resep = require("../Model/Resep.Model");
 const BuktiPembayaran = require("../Model/BuktiPembayaran.Model");
 const validasi = require("./Validasi");
@@ -71,38 +72,73 @@ exports.insertProdukTransaksi = (req, res) => {
       jumlah: data.jumlah
     }
     TransaksiProduk.create(produk_transaksi, (err, data) => {
-      if (err) {
-        if (err.kind == 'exists') {
-          error.push({
-            status: 409,
-            message: "Product exists within transaction : " + produk_transaksi.nomor_transaksi
-          })
+      Produk.updateQty(produk_transaksi.id_produk, produk_transaksi.jumlah, false, (errQty, dataQty) => {
+        if (err || errQty) {
+          if (err.kind == 'exists' || errQty.kind == 'exists') {
+            error.push({
+              status: 409,
+              message: "Product exists within transaction : " + produk_transaksi.nomor_transaksi
+            })
+          } else {
+            error.push({
+              status: 500,
+              message: "Some error occurred while creating the product transaction."
+            })
+          }
+          if ((i + 1) == validated.length) {
+            console.log("Error: ", error[0])
+            res.status(error[0].status).send({
+              message: error[0].message
+            });
+            return;
+          }
         } else {
-          error.push({
-            status: 500,
-            message: "Some error occurred while creating the product transaction."
-          })
+          sent_data.push(data);
+          if ((i + 1) == validated.length) {
+            Status.update(produk_transaksi.nomor_transaksi, 1, (err, data) => {
+              if (err) {
+                console.log(err)
+              }
+              console.log(data);
+              res.send(sent_data);
+              return;
+            })
+          }
         }
-        if ((i + 1) == validated.length) {
-          console.log("Error: ", error[0])
-          res.status(error[0].status).send({
-            message: error[0].message
-          });
+      })
+    })
+  })
+}
+
+exports.cancel = (req, res) => {
+  Status.update(req.params.nomorTR, 5, (err, data) => {
+    if (err) {
+      res.status(500).send({
+        message: "Error canceling transaction " + req.params.nomorTR
+      });
+      return;
+    }
+    TransaksiProduk.getFromTransaksi(req.params.nomorTR, (errTP, dataTP) => {
+      if (errTP) {
+        if (errTP.kind == 'not_found') {
+          res.send(data);
           return;
         }
-      } else {
-        sent_data.push(data);
-        if ((i + 1) == validated.length) {
-          Status.update(produk_transaksi.nomor_transaksi, 1, (err, data) => {
-            if(err) {
-              console.log(err)
-            }
-            console.log(data);
-            res.send(sent_data);
-            return;
-          })
-        }
+        res.status(500).send({
+          message: "Error canceling transaction " + req.params.nomorTR
+        });
+        return;
       }
+      dataTP.forEach(d => {
+        console.log('CONTOH', d);
+        Produk.updateQty(d.id_produk, parseInt(d.jumlah), true, (errP, dataP) => {
+          if (errP) {
+            console.log(errP);
+          }
+          console.log(dataP);
+          res.send(data);
+        })
+      })
     })
   })
 }
@@ -258,19 +294,21 @@ exports.create = (req, res) => {
           jumlah: tr.jumlah
         }
         TransaksiProduk.create(produk_transaksi, (err, data) => {
-          if (err) {
-            res.status(500).send({
-              message:
-                "Some error occurred while creating the product transaction."
-            });
-          }
-          sent_data.push(data);
-          if ((i + 1) == transaction.produk.length) {
-            result_data.produk = sent_data;
-            result_data.data_pengiriman = JSON.parse(result_data.data_pengiriman)
-            console.log(result_data);
-            res.send(result_data);
-          }
+          Produk.updateQty(produk_transaksi.id_produk, produk_transaksi.jumlah, false, (errP, dataP) => {
+            if (err || errP) {
+              res.status(500).send({
+                message:
+                  "Some error occurred while creating the product transaction."
+              });
+            }
+            sent_data.push(data);
+            if ((i + 1) == transaction.produk.length) {
+              result_data.produk = sent_data;
+              result_data.data_pengiriman = JSON.parse(result_data.data_pengiriman)
+              console.log(result_data);
+              res.send(result_data);
+            }
+          })
         })
       })
     })
@@ -288,8 +326,8 @@ exports.createWithResep = (req, res) => {
   if (!transaction) { return; }
   let result_data = {};
   const insertTransaction = (resolve, reject) => {
-    const data_pengiriman = (typeof transaction.data_pengiriman == 'string') ? 
-    transaction.data_pengiriman : JSON.stringify(transaction.data_pengiriman);
+    const data_pengiriman = (typeof transaction.data_pengiriman == 'string') ?
+      transaction.data_pengiriman : JSON.stringify(transaction.data_pengiriman);
     let transaksi = {
       id_pembeli: transaction.id_pembeli,
       data_pengiriman: data_pengiriman,

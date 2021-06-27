@@ -38,6 +38,7 @@ module.exports = app => {
   app.post("/transaksi/resep", imageUpload.uploadResep, transaksi.createWithResep);
   app.post("/upload/bukti", imageUpload.uploadBukti, transaksi.insertBukti);
   app.put("/status/:nomorTR", transaksi.updateStatus);
+  app.put("/transaksi/:nomorTR/cancel", transaksi.cancel);
   app.put("/transaksi/:nomorTR", transaksi.updateDataPengiriman);
   app.get("/transaksi", transaksi.getAll);
   app.get("/transaksi/status/:statusID", transaksi.getByStatus);

@@ -21,6 +21,11 @@ update transaksi
 insert produk DONE
 - insert ke produk dan kategori_produk DONE
 
+cancel transaksi DONE
+- update status 6 where id_transaksi DONE
+- get jumlah produk_transaksi where id_transaksi DONE
+- foreach produk_transaksi -> update qty produk where id_produk DONE
+
 
 insert kategori DONE
 insert pembeli DONE
