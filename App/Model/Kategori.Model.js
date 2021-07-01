@@ -15,7 +15,7 @@ class Kategori {
   }
 
   static getAll(result) {
-    const query = `SELECT * FROM kategori`
+    const query = `SELECT * FROM kategori ORDER BY nama ASC`
     sql.query(query, (err, res) => {
       if (err) {
         console.log("error: ", err);
