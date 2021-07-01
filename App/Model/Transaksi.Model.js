@@ -13,7 +13,8 @@ class Transaksi {
     database.query(`
       SELECT
       trn.nomor_transaksi, trn.id_pembeli, sts.jenis, rsp.id_resep, rsp.img_path as foto_resep, sts.status,
-      bkt.img_path as bukti_pembayaran, pmb.nama, pmb.nomor_telepon, trn.data_pengiriman, sts.last_updated
+      bkt.img_path as bukti_pembayaran, pmb.nama, pmb.nomor_telepon, trn.data_pengiriman, sts.last_updated.
+      trn.tanggal, sts.last_updated
       FROM transaksi as trn
       INNER JOIN pembeli as pmb ON trn.id_pembeli = pmb.id_pembeli
       INNER JOIN status as sts ON trn.nomor_transaksi = sts.nomor_transaksi
@@ -56,7 +57,8 @@ class Transaksi {
     database.query(`
       SELECT
       trn.nomor_transaksi, trn.id_pembeli, sts.jenis, rsp.id_resep, rsp.img_path as foto_resep, sts.status,
-      bkt.img_path as bukti_pembayaran, pmb.nama, pmb.nomor_telepon, trn.data_pengiriman, sts.last_updated
+      bkt.img_path as bukti_pembayaran, pmb.nama, pmb.nomor_telepon, trn.data_pengiriman, sts.last_updated,
+      trn.tanggal, sts.last_updated
       FROM transaksi as trn
       INNER JOIN pembeli as pmb ON trn.id_pembeli = pmb.id_pembeli
       INNER JOIN status as sts ON trn.nomor_transaksi = sts.nomor_transaksi
@@ -99,8 +101,9 @@ class Transaksi {
     let row;
     database.query(`
       SELECT
-      trn.nomor_transaksi, trn.id_pembeli, sts.jenis, rsp.id_resep, rsp.img_path as foto_resep, sts.status,
-      bkt.img_path as bukti_pembayaran, pmb.nama, pmb.nomor_telepon, trn.data_pengiriman, sts.last_updated
+      trn.nomor_transaksi, trn.id_pembeli, sts.jenis, rsp.id_resep, rsp.img_path as foto_resep, 
+      sts.status, bkt.img_path as bukti_pembayaran, pmb.nama, pmb.nomor_telepon, 
+      trn.data_pengiriman, trn.tanggal, sts.last_updated, trn.tanggal, sts.last_updated
       FROM transaksi as trn
       INNER JOIN pembeli as pmb ON trn.id_pembeli = pmb.id_pembeli
       INNER JOIN status as sts ON trn.nomor_transaksi = sts.nomor_transaksi
@@ -143,8 +146,9 @@ class Transaksi {
     let row1, row2, row;
     database.query(`
       SELECT
-      trn.nomor_transaksi, trn.id_pembeli, sts.jenis, rsp.id_resep, rsp.img_path as foto_resep, sts.status,
-      bkt.img_path as bukti_pembayaran, pmb.nama, pmb.nomor_telepon, trn.data_pengiriman, sts.last_updated
+      trn.nomor_transaksi, trn.id_pembeli, sts.jenis, rsp.id_resep, rsp.img_path as foto_resep, 
+      sts.status, bkt.img_path as bukti_pembayaran, pmb.nama, pmb.nomor_telepon, 
+      trn.data_pengiriman, sts.last_updated, trn.tanggal, sts.last_updated
       FROM transaksi as trn
       INNER JOIN pembeli as pmb ON trn.id_pembeli = pmb.id_pembeli
       INNER JOIN status as sts ON trn.nomor_transaksi = sts.nomor_transaksi

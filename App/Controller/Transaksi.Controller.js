@@ -201,7 +201,7 @@ exports.updateStatus = (req, res) => {
     })
     return;
   }
-  Status.update(req.params.nomorTR, validated, (err, data) => {
+  Status.update(req.params.nomorTR, validated.status, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
         res.status(404).send({
