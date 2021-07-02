@@ -75,7 +75,7 @@ class Status {
   }
 
   static create(status, result) {
-    sql.query('INSERT INTO status SET ?, last_updated = now(), tanggal = now()', status, (err, res) => {
+    sql.query('INSERT INTO status SET ?, last_updated = now()', status, (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(err, null);
@@ -88,7 +88,7 @@ class Status {
   }
 
   static updateByResep(resepID, result) {
-    sql.query('UPDATE status SET status = 1 WHERE id_resep = ?', resepID, (err, res) => {
+    sql.query('UPDATE status SET status = 1, last_updated = now() WHERE id_resep = ?', resepID, (err, res) => {
       if(err) {
         console.log("error: ", err);
         result(err, null);
@@ -112,7 +112,7 @@ class Status {
   }
 
   static update(nomorTR, status, result) {
-    sql.query('UPDATE status SET status = ? WHERE nomor_transaksi = ?', [status, nomorTR], (err, res) => {
+    sql.query('UPDATE status SET status = ?, last_updated = now() WHERE nomor_transaksi = ?', [status, nomorTR], (err, res) => {
       if(err) {
         console.log("error: ", err);
         result(err, null);
