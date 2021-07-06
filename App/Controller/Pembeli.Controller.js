@@ -2,8 +2,8 @@ const Pembeli = require("../Model/Pembeli.Model");
 const validasi = require("./Validasi");
 
 exports.create = (req, res) => {
-  const keys = ["nomor_telepon", "nama", "tanggal_lahir", "password"];
-  const types = ["number", "string", "string", "string"];
+  const keys = ["nomor_telepon", "nama", "tanggal_lahir", "password", "saved_data"];
+  const types = ["number", "string", "string", "string", ["string", "null"]];
   const validated = validasi.Validasi(req.body, keys, types, true);
   if (validated.invalid) {
     res.status(400).send({
@@ -24,8 +24,8 @@ exports.create = (req, res) => {
 }
 
 exports.update = (req, res) => {
-  const keys = ["nomor_telepon", "nama", "tanggal_lahir", "password"];
-  const types = ["number", "string", "string", "string"];
+  const keys = ["nomor_telepon", "nama", "tanggal_lahir", "password", "saved_data"];
+  const types = ["number", "string", "string", "string", "string"];
   const validated = validasi.Validasi(req.body, keys, types, false);
 
   if (validated.invalid) {
@@ -63,16 +63,26 @@ exports.getAll = (req, res) => {
   });
 }
 
-exports.getOne = (req, res) => {
-  Pembeli.getOne(req.params.pembeliID, (err, data) => {
+exports.authenticate = (req, res) => {
+  const keys = ["nomor_telepon", "password"];
+  const types = [["number", "string"], "string"];
+  const validated = validasi.Validasi(req.body, keys, types, false);
+  if (validated.invalid) {
+    res.status(400).send({
+      message: validated.message
+    });
+    console.log(validated.message)
+    return;
+  }
+  Pembeli.authenticate(req.body, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
         res.status(404).send({
-          message: `Not found user with id ${req.params.pembeliID}.`
+          message: `Nomor telepon atau password salah.`
         });
       } else {
         res.status(500).send({
-          message: "Error retrieving user with id " + req.params.pembeliID
+          message: "Error retrieving user"
         });
       }
     } else res.send(data);

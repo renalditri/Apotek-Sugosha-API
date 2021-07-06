@@ -13,7 +13,7 @@ module.exports = app => {
   const imageUpload = require("../Controller/Image.Controller");
 
   app.get("/pembeli", pembeli.getAll);
-  app.get("/pembeli/:pembeliID", pembeli.getOne);
+  app.post("/pembeli/login", pembeli.authenticate);
   app.post("/pembeli", pembeli.create);
   app.put("/pembeli/:pembeliID", pembeli.update);
 
@@ -27,6 +27,7 @@ module.exports = app => {
   app.post("/keranjang", keranjang.create);
   app.put("/keranjang/:pembeliID/:produkID", keranjang.update);
   app.delete("/keranjang/:pembeliID/:produkID", keranjang.delete);
+  app.delete("/keranjang/:pembeliID/", keranjang.deleteAll);
 
   app.post("/produk", imageUpload.uploadProduk, produk.create);
   app.get("/produk", produk.getAll);

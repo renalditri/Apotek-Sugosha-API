@@ -90,3 +90,19 @@ exports.delete = (req, res) => {
     } else { res.send({ message: `Cart was deleted successfully!` }) };
   });
 }
+
+exports.deleteAll = (req, res) => {
+  Keranjang.deleteAll(req.params.pembeliID, (err, data) => {
+    if (err) {
+      if (err.kind === "not_found") {
+        res.status(404).send({
+          message: `Not found cart with id_pembeli ${req.params.pembeliID}.`
+        });
+      } else {
+        res.status(500).send({
+          message: `Could not delete cart with id_pembeli ${req.params.pembeliID}.`
+        });
+      }
+    } else { res.send({ message: `Cart was deleted successfully!` }) };
+  })
+}

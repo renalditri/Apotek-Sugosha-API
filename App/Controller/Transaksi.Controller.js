@@ -136,9 +136,9 @@ exports.cancel = (req, res) => {
             console.log(errP);
           }
           console.log(dataP);
-          res.send(data);
         })
-      })
+      });
+      res.send(data);
     })
   })
 }
@@ -174,7 +174,7 @@ exports.insertBukti = (req, res) => {
         });
       }
     } else {
-      Status.update(validated.nomor_transaksi, { status: 2 }, (err, response) => {
+      Status.update(validated.nomor_transaksi, 2, (err, response) => {
         if (err) {
           if (err.kind === "not_found") {
             res.status(404).send({
@@ -253,6 +253,7 @@ exports.create = (req, res) => {
           message:
             "Some error occurred while creating the transaction."
         });
+        return;
       }
       result_data = data;
       resolve(data);
@@ -269,6 +270,7 @@ exports.create = (req, res) => {
       const status_validated = validateStatus(status, true, res);
       return new Promise((resolve, reject) => {
         Status.create(status_validated, (err, data) => {
+          console.log('STATUS: ', status_validated)
           if (err) {
             res.status(500).send({
               message: "Some error occurred while creating the status."
@@ -300,6 +302,7 @@ exports.create = (req, res) => {
                 message:
                   "Some error occurred while creating the product transaction."
               });
+              return;
             }
             sent_data.push(data);
             if ((i + 1) == transaction.produk.length) {

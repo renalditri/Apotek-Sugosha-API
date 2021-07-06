@@ -74,22 +74,22 @@ class Keranjang {
           sql.query(`
           UPDATE keranjang 
           SET jumlah = ? 
-          WHERE id_pembeli = ? AND id_produk = ?`, 
-          [newKeranjang.jumlah, newKeranjang.id_pembeli, newKeranjang.id_produk],
-          (err, res) => {
-            if (err) {
-              console.log("error: ", err);
-              result(err, null);
+          WHERE id_pembeli = ? AND id_produk = ?`,
+            [newKeranjang.jumlah, newKeranjang.id_pembeli, newKeranjang.id_produk],
+            (err, res) => {
+              if (err) {
+                console.log("error: ", err);
+                result(err, null);
+                return;
+              }
+              if (res.affectedRows == 0) {
+                console.log('not found')
+                result({ kind: "not_found" }, null);
+                return;
+              }
+              result(null, { exists: true, ...newKeranjang });
               return;
-            }
-            if(res.affectedRows == 0) {
-              console.log('not found')
-              result({ kind: "not_found" }, null);
-              return;
-            }
-            result(null, { exists: true, ...newKeranjang});
-            return;
-          })
+            })
         }
       })
   }
@@ -136,7 +136,22 @@ class Keranjang {
         result(null, err);
         return;
       })
+  }
 
+  static deleteAll(pembeliID, result) {
+    database.query(`DELETE FROM keranjang WHERE id_pembeli = ${pembeliID}`)
+      .then(res => {
+        if (res.affectedRows == 0) {
+          result({ kind: "not_found" }, null);
+          return;
+        }
+        console.log("deleted product cart with user id: " + pembeliID);
+        result(null, res);
+      }, err => {
+        console.log("error: ", err);
+        result(null, err);
+        return;
+      })
   }
 }
 
