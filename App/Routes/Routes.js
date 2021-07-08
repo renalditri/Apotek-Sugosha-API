@@ -3,6 +3,7 @@ module.exports = app => {
   const upload = multer();
   const produk = require("../Controller/Produk.Controller");
   const pembeli = require("../Controller/Pembeli.Controller");
+  const admin = require("../Controller/Admin.Controller");
   const keranjang = require("../Controller/Keranjang.Controller");
   const kategori = require("../Controller/Kategori.Controller");
   const kategori_produk = require("../Controller/Kategori.Produk.Controller");
@@ -16,6 +17,9 @@ module.exports = app => {
   app.post("/pembeli/login", pembeli.authenticate);
   app.post("/pembeli", pembeli.create);
   app.put("/pembeli/:pembeliID", pembeli.update);
+
+  app.post("/admin/login", admin.authenticate);
+  app.put("/admin/:adminID", admin.update);
 
   app.get("/kategori", kategori.getAll);
   app.get("/kategori/:kategoriID", kategori.getOne);
