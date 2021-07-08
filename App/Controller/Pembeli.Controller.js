@@ -2,8 +2,8 @@ const Pembeli = require("../Model/Pembeli.Model");
 const validasi = require("./Validasi");
 
 exports.create = (req, res) => {
-  const keys = ["nomor_telepon", "nama", "tanggal_lahir", "password", "saved_data"];
-  const types = ["number", "string", "string", "string", ["string", "null"]];
+  const keys = ["nomor_telepon", "nama", "tanggal_lahir", "password"];
+  const types = ["string", "string", "string", "string"];
   const validated = validasi.Validasi(req.body, keys, types, true);
   if (validated.invalid) {
     res.status(400).send({
@@ -25,7 +25,7 @@ exports.create = (req, res) => {
 
 exports.update = (req, res) => {
   const keys = ["nomor_telepon", "nama", "tanggal_lahir", "password", "saved_data"];
-  const types = ["number", "string", "string", "string", "string"];
+  const types = ["string", "string", "string", "string", "string"];
   const validated = validasi.Validasi(req.body, keys, types, false);
 
   if (validated.invalid) {
@@ -65,7 +65,7 @@ exports.getAll = (req, res) => {
 
 exports.authenticate = (req, res) => {
   const keys = ["nomor_telepon", "password"];
-  const types = [["number", "string"], "string"];
+  const types = ["number", "string"];
   const validated = validasi.Validasi(req.body, keys, types, false);
   if (validated.invalid) {
     res.status(400).send({
