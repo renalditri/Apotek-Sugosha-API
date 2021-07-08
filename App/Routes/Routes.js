@@ -19,6 +19,7 @@ module.exports = app => {
   app.put("/pembeli/:pembeliID", pembeli.update);
 
   app.post("/admin/login", admin.authenticate);
+  app.put("/admin/password/:adminID", admin.updatePassword);
   app.put("/admin/:adminID", admin.update);
 
   app.get("/kategori", kategori.getAll);

@@ -32,8 +32,31 @@ class Admin {
     });
   }
 
-  static update(adminID, newAdmin, password, result) {
+  static updatePassword(adminID, newAdmin, password, result) {
     sql.query('UPDATE admin SET ? WHERE id_admin = ? AND password = ?', [newAdmin, adminID, password], (err, res) => {
+      if(err) {
+        console.log("error: ", err);
+        result(err, null);
+        return;
+      }
+
+      if (res.affectedRows == 0 || res == null) {
+        // not found admin with the id
+        result({ kind: "not_found" }, null);
+        return;
+      }
+
+      console.log(res);
+      console.log('updated admin: ' + newAdmin);
+      result(null, {id: adminID, ...newAdmin});
+      return;
+    })
+  }
+
+  
+
+  static update(adminID, newAdmin, result) {
+    sql.query('UPDATE admin SET ? WHERE id_admin = ?', [newAdmin, adminID], (err, res) => {
       if(err) {
         console.log("error: ", err);
         result(err, null);
