@@ -38,7 +38,6 @@ class Transaksi {
             totalHarga += (r.jumlah * r.harga);
           })
           r.data_pengiriman = JSON.parse(r.data_pengiriman);
-          r.tanggal = r.tanggal.toISOString().split("T")[0];
           arr.push(r);
           arr[i].total = totalHarga;
           arr[i].produk = row2;
@@ -113,11 +112,13 @@ class Transaksi {
       WHERE trn.id_pembeli = ${pembeliID}
     `)
       .then(res => {
+        if(res.length < 1) {
+          result({ kind: "not_found" }, null);
+        }
         row = res;
         let arr = [];
         row.forEach(async (r, i) => {
           let totalHarga = 0;
-          r.tanggal = r.tanggal.toISOString().split("T")[0];
           const nomorTR = r.nomor_transaksi;
           const row2 = await database.query(`
             SELECT 
@@ -161,7 +162,6 @@ class Transaksi {
       .then(res => {
         if (res.length) {
           res[0].data_pengiriman = JSON.parse(res[0].data_pengiriman);
-          res[0].tanggal = res[0].tanggal.toISOString().split("T")[0];
           row1 = res[0];
           return database.query(`
             SELECT 

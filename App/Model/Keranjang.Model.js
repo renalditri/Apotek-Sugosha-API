@@ -115,7 +115,7 @@ class Keranjang {
         result({ kind: "not_found" }, null);
         return;
       }
-      console.log('updated cart: ' + newKeranjang);
+      console.log('updated cart: ', newKeranjang);
       result(null, { id_pembeli: pembeliID, id_produk: produkID, ...newKeranjang });
       return;
     })

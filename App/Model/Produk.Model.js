@@ -38,7 +38,7 @@ class Produk {
       if (max_stock !== "") { params += ` AND qty <= ${max_stock}` }
     } else if (max_stock !== "") { params += ` WHERE qty <= ${max_stock}` }
 
-    database.query("SELECT * FROM produk" + params)
+    database.query("SELECT * FROM produk" + params + " ORDER BY nama")
       .then(res => {
         row = res;
         let arr = [];

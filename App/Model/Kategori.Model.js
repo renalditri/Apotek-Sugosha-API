@@ -65,7 +65,7 @@ class Kategori {
             prdk.img_path, prdk.last_updated
             FROM kategori_produk as ktpr
             INNER JOIN produk as prdk ON ktpr.id_produk = prdk.id_produk
-            WHERE ktpr.id_kategori = ${kategoriID}
+            WHERE ktpr.id_kategori = ${kategoriID} ORDER BY prdk.nama
           `)
           res[0].produk = produk;
           console.log("Found category: ", res[0]);

@@ -16,6 +16,12 @@ exports.getFromTransaksi = (req, res) => {
   });
 }
 
-exports.create = (req, res) => {
-
+exports.getMostBought = (req, res) => {
+  TransaksiProduk.getMostBought((err, data) => {
+    if (err) {
+      res.status(500).send({
+        message: "Error retrieving most bought products"
+      });
+    } else res.send(data);
+  })
 }

@@ -35,9 +35,10 @@ module.exports = app => {
   app.delete("/keranjang/:pembeliID/", keranjang.deleteAll);
 
   app.post("/produk", imageUpload.uploadProduk, produk.create);
+  app.put("/produk/:productID", imageUpload.uploadProduk, produk.update);
   app.get("/produk", produk.getAll);
   app.get("/produk/:productID", produk.getOne);
-  app.put("/produk/:productID", imageUpload.uploadProduk, produk.update);
+  app.get("/top", transaksi_produk.getMostBought);
 
   app.post("/transaksi", transaksi.create);
   app.post("/transaksi/produk", transaksi.insertProdukTransaksi);

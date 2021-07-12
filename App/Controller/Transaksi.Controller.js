@@ -35,12 +35,18 @@ exports.getByStatus = (req, res) => {
 
 exports.getFromPembeli = (req, res) => {
   Transaksi.getFromPembeli(req.params.pembeliID, (err, data) => {
-    if (err)
+    if (err) {
+      if (err.kind === "not_found") {
+        res.status(404).send({
+          message: `Not found product with id ${req.params.pembeliID}.`
+        });
+        return;
+      }
       res.status(500).send({
         message:
           err.message || "Some error occurred while retrieving transaction."
       });
-    else res.send(data);
+    } else res.send(data);
   });
 }
 
