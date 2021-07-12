@@ -110,6 +110,7 @@ class Transaksi {
       LEFT JOIN bukti_pembayaran as bkt ON trn.nomor_transaksi = bkt.nomor_transaksi
       LEFT JOIN resep as rsp ON sts.id_resep = rsp.id_resep
       WHERE trn.id_pembeli = ${pembeliID}
+      ORDER BY sts.status ASC
     `)
       .then(res => {
         if(res.length < 1) {
