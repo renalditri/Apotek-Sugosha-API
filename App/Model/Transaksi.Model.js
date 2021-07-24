@@ -42,8 +42,7 @@ class Transaksi {
           arr[i].total = totalHarga;
           arr[i].produk = row2;
           if (i == (row.length - 1)) {
-            console.log("Found transactions: ");
-            console.log(arr);
+            console.log("Found transactions: ", arr);
             result(null, arr)
           };
         })
@@ -87,8 +86,7 @@ class Transaksi {
           arr[i].total = totalHarga;
           arr[i].produk = row2;
           if (i == (row.length - 1)) {
-            console.log("Found transactions: ");
-            console.log(arr);
+            console.log("Found transactions: ", arr);
             result(null, arr)
           };
         })
@@ -136,8 +134,7 @@ class Transaksi {
           arr[i].total = totalHarga;
           arr[i].produk = row2;
           if (i == (row.length - 1)) {
-            console.log("Found transactions: ");
-            console.log(arr);
+            console.log("Found transactions: ", arr);
             result(null, arr)
           };
         })

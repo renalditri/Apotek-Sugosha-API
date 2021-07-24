@@ -20,6 +20,7 @@ exports.getFromCustomer = (req, res) => {
 exports.create = (req, res) => {
   const keys = ["id_pembeli", "id_produk", "jumlah"];
   const types = ["number", "number", "number"];
+  console.log('tes post keranjang', req.body)
   const validated = validasi.Validasi(req.body, keys, types, true);
   if (validated.invalid) {
     res.status(400).send({
@@ -28,7 +29,7 @@ exports.create = (req, res) => {
     console.log(validated.message)
     return;
   }
-
+  console.log('tes post keranjang2', validated)
   Keranjang.create(validated, (err, data) => {
     if (err)
       if (err.kind === "exists") {

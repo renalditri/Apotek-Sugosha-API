@@ -18,37 +18,48 @@ class TransaksiProduk {
     INNER JOIN produk as pr ON pt.id_produk = pr.id_produk
     GROUP BY pt.id_produk
     `)
-    .then(async res => {
-      await res.forEach(async (r, i) => {
-        const kategori = await database.query(`
+      .then(async res => {
+        if (res.length < 4) {
+          return database.query(`
+            SELECT 
+            pr.id_produk, pr.nama, pr.harga, pr.qty, pr.satuan, pr.img_path
+            FROM produk as pr
+        `)
+        } else {
+          return res;
+        }
+      })
+      .then(async res => {
+        await res.forEach(async (r, i) => {
+          const kategori = await database.query(`
         SELECT ktgr.id_kategori, ktgr.nama, ktgr.tampil
         FROM produk as prdk
         INNER JOIN kategori_produk as ktpr ON ktpr.id_produk = prdk.id_produk
         INNER JOIN kategori as ktgr ON ktpr.id_kategori = ktgr.id_kategori
         WHERE prdk.id_produk = "${r.id_produk}"
       `);
-        kategori.map(r => {
-          if (r.tampil == 1) { r.tampil = true; return r; }
-          else { r.tampil = false; return r; }
-        })
-        r.kategori = kategori;
-        if((i + 1) == res.length) {
-          res.forEach(data => {
-            let isValid = false;
-            data.kategori.forEach(kt => {
-              isValid = kt.tampil;
-            })
-            if(isValid) {
-              response.push(data);
-            }
+          kategori.map(r => {
+            if (r.tampil == 1) { r.tampil = true; return r; }
+            else { r.tampil = false; return r; }
           })
-          if(response.length > 4) {
-            response = response.slice(0, 3)
+          r.kategori = kategori;
+          if ((i + 1) == res.length) {
+            res.forEach(data => {
+              let isValid = false;
+              data.kategori.forEach(kt => {
+                isValid = kt.tampil;
+              })
+              if (isValid) {
+                response.push(data);
+              }
+            })
+            if (response.length > 4) {
+              response = response.slice(0, 4)
+            }
+            result(null, response);
           }
-          result(null, response);
-        }
-      });
-    })
+        });
+      })
   }
 
   static getFromTransaksi(nomorTR, result) {

@@ -19,4 +19,11 @@ app.get("/", (req, res) => {
 });
 
 // set port, listen for requests
-app.listen(PORT, () => console.log(`app listening on port ${PORT}`))
+const server = app.listen(PORT, () => console.log(`app listening on port ${PORT}`))
+
+function stop() {
+  server.close();
+}
+
+module.exports = app;
+module.exports.stop = stop;

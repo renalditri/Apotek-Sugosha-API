@@ -32,8 +32,7 @@ class KategoriProduk {
             arr.push(r);
             arr[i].produk = row2;
             if (i == (res.length - 1)) {
-              console.log("Found category: ");
-              console.log(arr);
+              console.log("Found category: ", arr);
               result(null, arr)
               return;
             };

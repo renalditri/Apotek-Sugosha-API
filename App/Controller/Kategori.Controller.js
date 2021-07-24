@@ -31,7 +31,7 @@ exports.getOne = (req, res) => {
 exports.create = (req, res) => {
   const keys = ["nama", "img_path", "tampil"];
   const types = ["string", "string", "boolean"];
-  if (!req.body && !req.file) {
+  if (!req.body || !req.file) {
     res.status(400).send({
       message: "Error with data/files, please make sure your data is correct"
     })

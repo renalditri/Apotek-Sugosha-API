@@ -67,6 +67,18 @@ exports.getOne = (req, res) => {
 }
 
 exports.insertProdukTransaksi = (req, res) => {
+  if (!req.body.produk) {
+    res.status(400).send({
+      message: 'Terdapat masalah dalam data, mohon konfirmasi kembali'
+    });
+    return;
+  }
+  if (req.body.produk.length < 1) {
+    res.status(400).send({
+      message: 'Terdapat masalah dalam data, mohon konfirmasi kembali'
+    });
+    return;
+  }
   const validated = validateProductTransaction(req.body.produk, res, true);
   if (!validated) { return; }
   let error = [];
@@ -117,17 +129,31 @@ exports.insertProdukTransaksi = (req, res) => {
 }
 
 exports.cancel = (req, res) => {
-  Status.update(req.params.nomorTR, 5, (err, data) => {
-    if (err) {
+  Status.getFromTransaksi(req.params.nomorTR, (e, d) => {
+    if (e) {
+      if (e.kind) {
+        res.status(404).send({
+          message: "Not found status with transaction id " + req.params.nomorTR
+        });
+        return;
+      }
       res.status(500).send({
         message: "Error canceling transaction " + req.params.nomorTR
       });
       return;
     }
-    TransaksiProduk.getFromTransaksi(req.params.nomorTR, (errTP, dataTP) => {
-      if (errTP) {
-        if (errTP.kind == 'not_found') {
-          res.send(data);
+    if (d[0].status > 3) {
+      res.status(409).send({
+        message: "Transaction cannot be cancelled"
+      });
+      return;
+    }
+    Status.update(req.params.nomorTR, 5, (err, data) => {
+      if (err) {
+        if (err == 'not_found') {
+          res.status(404).send({
+            message: "Not found status with transaction id " + req.params.nomorTR
+          });
           return;
         }
         res.status(500).send({
@@ -135,16 +161,27 @@ exports.cancel = (req, res) => {
         });
         return;
       }
-      dataTP.forEach(d => {
-        console.log('CONTOH', d);
-        Produk.updateQty(d.id_produk, parseInt(d.jumlah), true, (errP, dataP) => {
-          if (errP) {
-            console.log(errP);
+      TransaksiProduk.getFromTransaksi(req.params.nomorTR, (errTP, dataTP) => {
+        if (errTP) {
+          if (errTP.kind == 'not_found') {
+            res.send(data);
+            return;
           }
-          console.log(dataP);
-        })
-      });
-      res.send(data);
+          res.status(500).send({
+            message: "Error canceling transaction " + req.params.nomorTR
+          });
+          return;
+        }
+        dataTP.forEach(d => {
+          Produk.updateQty(d.id_produk, parseInt(d.jumlah), true, (errP, dataP) => {
+            if (errP) {
+              console.log(errP);
+            }
+            console.log(dataP);
+          })
+        });
+        res.send(data);
+      })
     })
   })
 }
@@ -152,7 +189,7 @@ exports.cancel = (req, res) => {
 exports.insertBukti = (req, res) => {
   const keys = ["nomor_transaksi", "img_path"];
   const types = ["number", "string"];
-  if (!req.body && !req.file) {
+  if (!req.body || !req.file) {
     res.status(400).send({
       message: "Error with data/files, please make sure your data is correct"
     })
@@ -200,6 +237,7 @@ exports.insertBukti = (req, res) => {
 exports.updateStatus = (req, res) => {
   const keys = ["status"];
   const types = ["number"];
+  console.log(req.body)
   const validated = validasi.Validasi(req.body, keys, types, false)
   if (validated.invalid) {
     res.status(400).send({
@@ -226,6 +264,12 @@ exports.updateDataPengiriman = (req, res) => {
   const keys = ["data_pengiriman"];
   const types = ["object"];
   const validated = validasi.Validasi(req.body, keys, types);
+  if (validated.invalid) {
+    res.status(400).send({
+      message: validated.message
+    })
+    return;
+  }
   validated.data_pengiriman = JSON.stringify(validated.data_pengiriman);
   Transaksi.update(req.params.nomorTR, validated, (err, data) => {
     if (err) {
@@ -289,7 +333,10 @@ exports.create = (req, res) => {
       })
     })
     .then(response => {
-      if (!response) { console.log("RESPONSE", response); return; }
+      if (!response) {
+        console.log("RESPONSE", response); 
+        return;
+      }
       console.log("Insert Products, Response: ", response);
       result_data.id_resep = null;
       result_data.status = response.status;
@@ -324,7 +371,7 @@ exports.create = (req, res) => {
 }
 
 exports.createWithResep = (req, res) => {
-  if (!req.body && !req.file) {
+  if (!req.body || !req.file) {
     res.status(400).send({
       message: "Error with data/files, please make sure your data is correct"
     })
@@ -462,18 +509,22 @@ function validateProductTransaction(data, res, trExists) {
     keys.push("nomor_transaksi");
     types.push("number")
   }
-  data.forEach(d => {
-    const valid = validasi.Validasi(d, keys, types, true)
-    if (valid.invalid) {
-      res.status(400).send({
-        message: valid.message
-      });
-      console.log(valid.message)
-      isValid = false;
-      return;
-    }
-    validated.push(valid)
-  })
+  if (data) {
+    if (data.length > 0) {
+      data.forEach(d => {
+        const valid = validasi.Validasi(d, keys, types, true)
+        if (valid.invalid) {
+          res.status(400).send({
+            message: valid.message
+          });
+          console.log(valid.message)
+          isValid = false;
+          return;
+        }
+        validated.push(valid)
+      })
+    } else { isValid = false }
+  } else { isValid = false }
   if (!isValid) { return isValid }
   return validated;
 }

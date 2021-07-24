@@ -60,9 +60,7 @@ class Produk {
           arr.push(r);
           arr[i].kategori = row2;
           if (i == (row.length - 1)) {
-            console.log("Found products: ");
-            console.log(arr);
-            console.log(arr[i].last_updated)
+            console.log("Found products: ", arr);
             result(null, arr)
           };
         })

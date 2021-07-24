@@ -45,6 +45,10 @@ class Status {
         result(null, err);
         return;
       }
+      if(res.length < 1) {
+        result({ kind: "not_found" }, null)
+        return;
+      }
       res.map(r => {
         r.data_pengiriman = JSON.parse(r.data_pengiriman)
       })
@@ -67,6 +71,10 @@ class Status {
         console.log("error: ", err);
         result(null, err);
         return
+      }
+      if(res.length < 1) {
+        result({ kind: "not_found" }, null)
+        return;
       }
       res[0].data_pengiriman = JSON.parse(res[0].data_pengiriman);
       console.log("status: ", res);

@@ -6,7 +6,7 @@ exports.Validasi = (datas, keys, types, isPost) => {
     let valid = true;
     if (existKey >= 0) {
       if (types[existKey] === "number") {
-        if (!isNaN(val)) { val = parseInt(val) }
+        if (!isNaN(val) && !isNaN(parseInt(val))) { val = parseInt(val) }
         else { valid = false }
       }
       if (types[existKey] === "boolean") {
