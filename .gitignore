@@ -2,3 +2,6 @@ node_modules/
 mochawesome-report/
 coverage/
 .nyc_output/
+./nexttodo.txt
+./tes.js
+./todo.txt
